@@ -1,0 +1,173 @@
+export const CYCLONE_ABI = [
+  {
+    type: 'function',
+    name: 'createDispute',
+    inputs: [
+      { name: 'partyB', type: 'address' },
+      { name: 'token', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'description', type: 'string' },
+      { name: 'targetJurorCount', type: 'uint256' },
+    ],
+    outputs: [{ name: 'disputeId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'submitJurorList',
+    inputs: [
+      { name: 'disputeId', type: 'uint256' },
+      { name: 'proposedJurors', type: 'address[]' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'castVote',
+    inputs: [
+      { name: 'disputeId', type: 'uint256' },
+      { name: 'vote', type: 'uint8' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'adminResolve',
+    inputs: [
+      { name: 'disputeId', type: 'uint256' },
+      { name: 'verdict', type: 'uint8' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'approveJuror',
+    inputs: [{ name: 'juror', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'revokeJuror',
+    inputs: [{ name: 'juror', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getDisputeInfo',
+    inputs: [{ name: 'disputeId', type: 'uint256' }],
+    outputs: [
+      { name: 'partyA', type: 'address' },
+      { name: 'partyB', type: 'address' },
+      { name: 'token', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'description', type: 'string' },
+      { name: 'targetJurorCount', type: 'uint256' },
+      { name: 'status', type: 'uint8' },
+      { name: 'verdict', type: 'uint8' },
+      { name: 'createdAt', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getConfirmedJurors',
+    inputs: [{ name: 'disputeId', type: 'uint256' }],
+    outputs: [{ name: '', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getVoteTally',
+    inputs: [{ name: 'disputeId', type: 'uint256' }],
+    outputs: [
+      { name: 'partyAVotes', type: 'uint256' },
+      { name: 'partyBVotes', type: 'uint256' },
+      { name: 'totalVotesCast', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getPartyJurorList',
+    inputs: [
+      { name: 'disputeId', type: 'uint256' },
+      { name: 'isPartyA', type: 'bool' },
+    ],
+    outputs: [{ name: '', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getApprovedJurors',
+    inputs: [],
+    outputs: [{ name: '', type: 'address[]' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getPlatformStats',
+    inputs: [],
+    outputs: [
+      { name: 'totalDisputes', type: 'uint256' },
+      { name: 'approvedJurorsCount', type: 'uint256' },
+      { name: 'totalValueArbitrated', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isApprovedJuror',
+    inputs: [{ name: 'juror', type: 'address' }],
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+export const ERC20_ABI = [
+  {
+    type: 'function',
+    name: 'approve',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'allowance',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'balanceOf',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'decimals',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'symbol',
+    inputs: [],
+    outputs: [{ name: '', type: 'string' }],
+    stateMutability: 'view',
+  },
+] as const;

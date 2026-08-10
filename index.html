@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cyclone | Arc Testnet Dispute Arbitration</title>
+    <script>
+      (function() {
+        if (typeof window !== 'undefined') {
+          if (typeof window.global === 'undefined') {
+            window.global = window;
+          }
+          if (window.fetch) {
+            try {
+              var origFetch = window.fetch.bind(window);
+              Object.defineProperty(window, 'fetch', {
+                value: origFetch,
+                writable: true,
+                configurable: true,
+                enumerable: true
+              });
+            } catch (e) {}
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

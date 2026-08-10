@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-primary: #722d6c;
+  --color-primary-container: #8e4585;
+  --color-plum-purple: #8E4585;
+  --color-dusty-pink: #DCA1A1;
+  --color-muted-rosewood: #996666;
+  --color-charcoal: #4A4A4A;
+  --color-background: #fbf9f8;
+  --color-surface: #fbf9f8;
+  --color-surface-container-low: #f5f3f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-dim: #dbd9d9;
+  --color-inverse-surface: #303030;
+  --color-outline-variant: #d4c1cd;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #fbf9f8;
+  color: #1b1c1c;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}
+
+.glow-effect {
+  text-shadow: 0 0 12px rgba(142,69,133,0.35);
+}
+
+.farhan-glow {
+  transition: all 0.3s ease;
+}
+
+.farhan-glow:hover {
+  color: #ffd7f4;
+  text-shadow: 0 0 14px rgba(220,161,161,0.8), 0 0 25px rgba(142,69,133,0.6);
+}
+
+.pulse-primary {
+  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(142, 69, 133, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(142, 69, 133, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(142, 69, 133, 0);
+  }
+}
+
