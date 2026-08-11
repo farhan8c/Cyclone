@@ -27,10 +27,12 @@ export const arcTestnet = defineChain({
 });
 
 export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS ||
-  '0x36C9C43761E90E951eF5453E53112EFEb31F86e4') as `0x${string}`;
+  '0x89e73e6d885eeFA1a99bEBA1feF983BcAFe11Ce3') as `0x${string}`;
 
 export const WALLETCONNECT_PROJECT_ID =
-  import.meta.env.VITE_WALLETCONNECT_ID || '3a8170812b534d0ff9d794f19a901d64';
+  import.meta.env.VITE_WALLETCONNECT_ID || '32f0a88085c5761c23ce33d555875e2a';
+
+export const ADMIN_ADDRESS = '0x8C4eCe4809bdD380Ae944f1e72DAeF769CC6f55B' as `0x${string}`;
 
 export const TOKENS = {
   USDC: {

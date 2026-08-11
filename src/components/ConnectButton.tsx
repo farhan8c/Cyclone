@@ -111,7 +111,7 @@ export const ConnectWalletButton: React.FC = () => {
             </div>
 
             <p className="text-xs text-center text-[#50434c] mt-6">
-              By connecting a wallet, you agree to Cyclone's Terms of Arbitration on Arc Testnet.
+              By connecting a wallet, you agree to Cycloone's Terms of Arbitration on Arc Testnet.
             </p>
           </div>
         </div>

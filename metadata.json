@@ -1,5 +1,5 @@
 {
-  "name": "Cyclone",
+  "name": "Cycloone",
   "description": "An on-chain dispute arbitration platform deployed on Arc Testnet.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

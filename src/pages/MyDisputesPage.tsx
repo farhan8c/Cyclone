@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useDisputes } from '../context/DisputeContext';
 import { DisputeStatus } from '../types';
+import { ConnectWalletButton } from '../components/ConnectButton';
 import {
   Gavel,
   FilePlus,
@@ -10,19 +11,18 @@ import {
   CheckCircle2,
   ChevronRight,
   Search,
-  Filter,
+  Wallet,
 } from 'lucide-react';
 
 export const MyDisputesPage: React.FC = () => {
   const { address } = useAccount();
-  const { disputes } = useDisputes();
+  const { disputes, loading } = useDisputes();
   const [activeTab, setActiveTab] = useState<'all' | 'claimant' | 'respondent' | 'voting'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const currentAddress = (address || '0x71C0000000000000000000000000000000004f9A').toLowerCase();
+  const currentAddress = (address || '').toLowerCase();
 
   const filteredDisputes = disputes.filter((d) => {
-    // Search query filter
     const matchesSearch =
       d.id.toString().includes(searchQuery) ||
       d.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,112 +56,134 @@ export const MyDisputesPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Tabs & Search Filter Bar */}
-      <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {[
-            { key: 'all', label: 'All Disputes' },
-            { key: 'claimant', label: 'As Claimant' },
-            { key: 'respondent', label: 'As Respondent' },
-            { key: 'voting', label: 'Voting Phase' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                activeTab === tab.key
-                  ? 'bg-[#8E4585] text-white shadow-sm'
-                  : 'bg-[#f5f3f3] text-[#50434c] hover:bg-[#efeded]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+      {!address ? (
+        <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-10 text-center shadow-sm space-y-6">
+          <div className="w-16 h-16 rounded-full bg-[#f5f3f3] flex items-center justify-center text-[#8E4585] mx-auto">
+            <Wallet className="w-8 h-8 text-[#8E4585]" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-[#1b1c1c]">Wallet Connection Required</h2>
+            <p className="text-sm text-[#50434c] max-w-md mx-auto">
+              Connect your wallet to view your active disputes, manage claims, and track arbitration progress.
+            </p>
+          </div>
+          <div className="pt-2 flex justify-center">
+            <ConnectWalletButton />
+          </div>
         </div>
-
-        {/* Search Input */}
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-[#82737d] absolute left-3 top-3" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search dispute # or keywords..."
-            className="w-full bg-[#fbf9f8] border border-[#d4c1cd]/60 rounded-xl pl-9 pr-4 py-2 text-xs text-[#1b1c1c] outline-none focus:border-[#8E4585]"
-          />
-        </div>
-      </div>
-
-      {/* Disputes Cards List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDisputes.map((dispute) => (
-          <div
-            key={dispute.id}
-            className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#8E4585]/50 transition-all flex flex-col justify-between space-y-4"
-          >
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-mono text-xs font-bold text-[#8E4585]">
-                  Dispute #{dispute.id}
-                </span>
-
-                {dispute.status === DisputeStatus.Matching && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                    Matching Phase
-                  </span>
-                )}
-                {dispute.status === DisputeStatus.Voting && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ffd7f4] text-[#722d6c]">
-                    Voting Phase
-                  </span>
-                )}
-                {dispute.status === DisputeStatus.Resolved && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    Resolved
-                  </span>
-                )}
-              </div>
-
-              <h3 className="text-base font-bold text-[#1b1c1c] line-clamp-2 leading-snug">
-                {dispute.description}
-              </h3>
-
-              <div className="p-3 rounded-xl bg-[#fbf9f8] border border-[#efeded] text-xs space-y-1.5 font-mono">
-                <div className="flex justify-between">
-                  <span className="text-[#50434c] font-sans">Escrow:</span>
-                  <span className="font-bold text-[#8E4585]">
-                    {dispute.amountFormatted} {dispute.tokenSymbol}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#50434c] font-sans">Panel Size:</span>
-                  <span className="font-semibold text-[#1b1c1c]">
-                    {dispute.targetJurorCount} Jurors
-                  </span>
-                </div>
-              </div>
+      ) : (
+        <>
+          {/* Tabs & Search Filter Bar */}
+          <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-2 w-full md:w-auto">
+              {[
+                { key: 'all', label: 'All Disputes' },
+                { key: 'claimant', label: 'As Claimant' },
+                { key: 'respondent', label: 'As Respondent' },
+                { key: 'voting', label: 'Voting Phase' },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as any)}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    activeTab === tab.key
+                      ? 'bg-[#8E4585] text-white shadow-sm'
+                      : 'bg-[#f5f3f3] text-[#50434c] hover:bg-[#efeded]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
-            <div className="pt-2 flex justify-between items-center border-t border-[#efeded]">
-              <span className="text-[10px] text-[#50434c]">
-                {dispute.confirmedJurors.length} / {dispute.targetJurorCount} Jurors Matched
-              </span>
-              <Link
-                to={`/dispute/${dispute.id}`}
-                className="inline-flex items-center gap-1 text-xs font-bold text-[#8E4585] hover:text-[#722d6c]"
+            {/* Search Input */}
+            <div className="relative w-full md:w-72">
+              <Search className="w-4 h-4 text-[#82737d] absolute left-3 top-3" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search dispute # or keywords..."
+                className="w-full bg-[#fbf9f8] border border-[#d4c1cd]/60 rounded-xl pl-9 pr-4 py-2 text-xs text-[#1b1c1c] outline-none focus:border-[#8E4585]"
+              />
+            </div>
+          </div>
+
+          {/* Disputes Cards List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDisputes.map((dispute) => (
+              <div
+                key={dispute.id}
+                className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-[#8E4585]/50 transition-all flex flex-col justify-between space-y-4"
               >
-                View Details <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        ))}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-mono text-xs font-bold text-[#8E4585]">
+                      Dispute #{dispute.id}
+                    </span>
 
-        {filteredDisputes.length === 0 && (
-          <div className="col-span-full bg-white border border-[#d4c1cd]/30 rounded-2xl p-12 text-center text-sm text-[#50434c]">
-            No disputes found matching the selected filter.
+                    {dispute.status === DisputeStatus.Matching && (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                        Matching Phase
+                      </span>
+                    )}
+                    {dispute.status === DisputeStatus.Voting && (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ffd7f4] text-[#722d6c]">
+                        Voting Phase
+                      </span>
+                    )}
+                    {dispute.status === DisputeStatus.Resolved && (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                        Resolved
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-base font-bold text-[#1b1c1c] line-clamp-2 leading-snug">
+                    {dispute.description}
+                  </h3>
+
+                  <div className="p-3 rounded-xl bg-[#fbf9f8] border border-[#efeded] text-xs space-y-1.5 font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-[#50434c] font-sans">Escrow:</span>
+                      <span className="font-bold text-[#8E4585]">
+                        {dispute.amountFormatted} {dispute.tokenSymbol}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#50434c] font-sans">Panel Size:</span>
+                      <span className="font-semibold text-[#1b1c1c]">
+                        {dispute.targetJurorCount} Jurors
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-between items-center border-t border-[#efeded]">
+                  <span className="text-[10px] text-[#50434c]">
+                    {dispute.confirmedJurors.length} / {dispute.targetJurorCount} Jurors Matched
+                  </span>
+                  <Link
+                    to={`/dispute/${dispute.id}`}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#8E4585] hover:text-[#722d6c]"
+                  >
+                    View Details <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+
+            {filteredDisputes.length === 0 && (
+              <div className="col-span-full bg-white border border-[#d4c1cd]/30 rounded-2xl p-12 text-center text-sm text-[#50434c] space-y-3">
+                <p className="font-medium text-[#1b1c1c]">No disputes found on-chain</p>
+                <p className="text-xs text-[#50434c]">
+                  There are currently no disputes matching the selected filter.
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };

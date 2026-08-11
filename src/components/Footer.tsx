@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
 
         {/* Small muted disclaimer */}
         <p className="text-xs text-[#e4e2e2]/60 max-w-md text-center">
-          Cyclone is an independent project built on Arc Testnet.
+          Cycloone is an independent project built on Arc Testnet.
         </p>
       </div>
     </footer>

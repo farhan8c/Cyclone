@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAccount } from 'wagmi';
 import { useDisputes } from '../context/DisputeContext';
 import { DisputeStatus, Verdict } from '../types';
+import { ConnectWalletButton } from '../components/ConnectButton';
 import {
   Gavel,
-  Clock,
   CheckCircle2,
-  AlertCircle,
-  Vote,
   Users,
   ShieldCheck,
-  UserCheck,
   ArrowLeft,
   ExternalLink,
   ChevronRight,
   Sparkles,
+  Wallet,
+  ShieldAlert,
 } from 'lucide-react';
 
 export const DisputeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const disputeId = Number(id || '4092');
+  const disputeId = Number(id || '1');
   const { address } = useAccount();
 
   const {
@@ -41,13 +39,14 @@ export const DisputeDetailPage: React.FC = () => {
 
   const [showVoteModal, setShowVoteModal] = useState<boolean>(false);
   const [castingVote, setCastingVote] = useState<boolean>(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   if (!dispute) {
     return (
       <div className="min-h-screen bg-[#fbf9f8] px-6 py-20 text-center">
         <h2 className="text-2xl font-bold text-[#1b1c1c] mb-2">Dispute #{disputeId} Not Found</h2>
         <p className="text-sm text-[#50434c] mb-6">
-          The requested dispute does not exist or has not been synced yet.
+          The requested dispute does not exist on-chain or has not been synced yet.
         </p>
         <Link
           to="/my-disputes"
@@ -66,8 +65,8 @@ export const DisputeDetailPage: React.FC = () => {
   const totalVotesCast = partyAVotesCount + partyBVotesCount;
   const majorityThreshold = Math.floor(dispute.targetJurorCount / 2) + 1;
 
-  // Check if connected address is a confirmed juror who has not voted yet
-  const userAddress = address?.toLowerCase() || '0x741c000000000000000000000000000000000f9a';
+  // Check if connected address is a confirmed juror
+  const userAddress = address?.toLowerCase() || '';
   const isConfirmedJuror = dispute.confirmedJurors.some(
     (j) => j.toLowerCase() === userAddress
   );
@@ -112,17 +111,37 @@ export const DisputeDetailPage: React.FC = () => {
   };
 
   const handleSaveProposedJurors = async () => {
+    setActionError(null);
+    if (!address) {
+      setActionError('Wallet not connected. Please connect wallet first.');
+      return;
+    }
     setSubmittingProposal(true);
-    await submitJurorsForDispute(dispute.id, selectedJurorsForProposal);
-    setSubmittingProposal(false);
-    setShowProposeModal(false);
+    try {
+      await submitJurorsForDispute(dispute.id, selectedJurorsForProposal);
+      setShowProposeModal(false);
+    } catch (err: any) {
+      setActionError(err?.message || 'Failed to submit proposed jurors.');
+    } finally {
+      setSubmittingProposal(false);
+    }
   };
 
   const handleCastVoteAction = async (verdict: Verdict) => {
+    setActionError(null);
+    if (!address) {
+      setActionError('Wallet not connected. Please connect wallet first.');
+      return;
+    }
     setCastingVote(true);
-    await voteOnDispute(dispute.id, verdict);
-    setCastingVote(false);
-    setShowVoteModal(false);
+    try {
+      await voteOnDispute(dispute.id, verdict);
+      setShowVoteModal(false);
+    } catch (err: any) {
+      setActionError(err?.message || 'Failed to cast vote.');
+    } finally {
+      setCastingVote(false);
+    }
   };
 
   return (
@@ -136,6 +155,18 @@ export const DisputeDetailPage: React.FC = () => {
           <ArrowLeft className="w-4 h-4" /> Back to Disputes List
         </Link>
       </div>
+
+      {actionError && (
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0" />
+            <span>{actionError}</span>
+          </div>
+          <button onClick={() => setActionError(null)} className="font-bold text-xs text-rose-900">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main Dispute Header Banner */}
       <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
@@ -254,7 +285,6 @@ export const DisputeDetailPage: React.FC = () => {
 
           <div className="flex justify-between text-xs text-[#50434c]">
             <span>{totalVotesCast} of {dispute.targetJurorCount} votes cast</span>
-            {dispute.timeRemaining && <span>Time remaining: {dispute.timeRemaining}</span>}
           </div>
         </div>
 
@@ -263,24 +293,30 @@ export const DisputeDetailPage: React.FC = () => {
           <div className="pt-2 flex flex-wrap gap-4 items-center justify-between bg-[#ffd7f4]/20 p-4 rounded-xl border border-[#8E4585]/20">
             <div className="flex items-center gap-2 text-sm text-[#722d6c] font-medium">
               <Sparkles className="w-4 h-4 text-[#8E4585]" />
-              {isConfirmedJuror
+              {!address
+                ? 'Connect wallet to cast a vote.'
+                : isConfirmedJuror
                 ? hasVoted
                   ? 'You have already submitted your vote on this dispute.'
                   : 'You are a confirmed juror on this dispute panel!'
-                : 'Connect with a confirmed juror wallet to cast a vote.'}
+                : 'Your connected wallet is not a confirmed juror on this panel.'}
             </div>
 
-            <button
-              onClick={() => setShowVoteModal(true)}
-              disabled={hasVoted}
-              className="px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#8E4585] hover:bg-[#722d6c] transition-all shadow-sm disabled:opacity-50"
-            >
-              {hasVoted ? 'Vote Submitted' : 'Cast Your Vote'}
-            </button>
+            {!address ? (
+              <ConnectWalletButton />
+            ) : (
+              <button
+                onClick={() => setShowVoteModal(true)}
+                disabled={!isConfirmedJuror || hasVoted}
+                className="px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#8E4585] hover:bg-[#722d6c] transition-all shadow-sm disabled:opacity-50"
+              >
+                {hasVoted ? 'Vote Submitted' : 'Cast Your Vote'}
+              </button>
+            )}
           </div>
         )}
 
-        {/* Confirmed Jurors List matching Image 9 */}
+        {/* Confirmed Jurors List */}
         <div>
           <h3 className="text-sm font-bold text-[#1b1c1c] mb-3 uppercase tracking-wider">
             Confirmed Panel Jurors ({dispute.confirmedJurors.length} / {dispute.targetJurorCount})
@@ -339,7 +375,7 @@ export const DisputeDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Juror Matching Phase Section (Matching Image 9 Layout) */}
+      {/* Juror Matching Phase Section */}
       <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
         <div className="flex justify-between items-center border-b border-[#efeded] pb-4">
           <div>
@@ -349,15 +385,19 @@ export const DisputeDetailPage: React.FC = () => {
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              setSelectedJurorsForProposal(approvedJurors.slice(0, 4));
-              setShowProposeModal(true);
-            }}
-            className="px-4 py-2 rounded-lg text-xs font-semibold text-[#8E4585] border border-[#8E4585] hover:bg-[#ffd7f4]/30 transition-all"
-          >
-            Propose Juror List
-          </button>
+          {!address ? (
+            <ConnectWalletButton />
+          ) : (
+            <button
+              onClick={() => {
+                setSelectedJurorsForProposal(approvedJurors.slice(0, 4));
+                setShowProposeModal(true);
+              }}
+              className="px-4 py-2 rounded-lg text-xs font-semibold text-[#8E4585] border border-[#8E4585] hover:bg-[#ffd7f4]/30 transition-all"
+            >
+              Propose Juror List
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -460,6 +500,12 @@ export const DisputeDetailPage: React.FC = () => {
                   </div>
                 );
               })}
+
+              {approvedJurors.length === 0 && (
+                <div className="text-center py-4 text-xs text-[#50434c]">
+                  No approved jurors available in pool yet.
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-[#efeded]">

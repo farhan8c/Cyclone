@@ -68,7 +68,7 @@ export const ScalesIllustration: React.FC = () => {
         </svg>
 
         <div className="absolute bottom-4 right-4 text-[10px] text-[#82737d] font-mono tracking-widest uppercase">
-          Cyclone Protocol · Arc Testnet
+          Cycloone Protocol · Arc Testnet
         </div>
       </div>
     </div>

@@ -43,7 +43,7 @@ export const HomePage: React.FC = () => {
     },
     {
       q: 'Where are disputed funds held?',
-      a: 'Funds are locked securely in the Cyclone smart contract escrow on Arc Testnet for the entire duration of arbitration until a majority decision automatically releases them to the winning party.',
+      a: 'Funds are locked securely in the Cycloone smart contract escrow on Arc Testnet for the entire duration of arbitration until a majority decision automatically releases them to the winning party.',
     },
   ];
 
@@ -137,10 +137,10 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* How Cyclone Works */}
+      {/* How Cycloone Works */}
       <section className="max-w-[1200px] mx-auto px-6 py-20 md:py-28">
         <div className="text-center mb-16 space-y-3">
-          <h2 className="text-3xl font-semibold text-[#1b1c1c]">How Cyclone Works</h2>
+          <h2 className="text-3xl font-semibold text-[#1b1c1c]">How Cycloone Works</h2>
           <p className="text-base text-[#50434c] max-w-2xl mx-auto">
             A transparent, systematic approach to on-chain arbitration.
           </p>
@@ -207,7 +207,7 @@ export const HomePage: React.FC = () => {
           <div className="md:col-span-5 space-y-6">
             <h2 className="text-3xl font-semibold text-[#1b1c1c]">Objective Arbitration</h2>
             <p className="text-base text-[#50434c] leading-relaxed">
-              Cyclone relies on a neutral environment. Jurors are meticulously admin-approved and vote without secondary financial incentives to skew their judgment.
+              Cycloone relies on a neutral environment. Jurors are meticulously admin-approved and vote without secondary financial incentives to skew their judgment.
             </p>
             <p className="text-base text-[#50434c] leading-relaxed">
               The outcome is strictly determined by a simple majority, ensuring that consensus dictates resolution.
@@ -280,7 +280,7 @@ export const HomePage: React.FC = () => {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="text-center space-y-2">
             <span className="text-xs font-semibold text-[#8E4585] uppercase tracking-wider">
-              About Cyclone
+              About Cycloone
             </span>
             <h2 className="text-3xl font-bold text-[#1b1c1c]">Clear & Transparent Arbitration</h2>
           </div>

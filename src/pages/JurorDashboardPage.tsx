@@ -1,31 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAccount } from 'wagmi';
 import { useDisputes } from '../context/DisputeContext';
 import { DisputeStatus, Verdict } from '../types';
+import { ConnectWalletButton } from '../components/ConnectButton';
 import {
-  Gavel,
   Clock,
   CheckCircle2,
-  AlertCircle,
-  Vote,
-  ShieldCheck,
-  UserCheck,
-  ArrowRight,
-  ChevronRight,
   Sparkles,
+  ChevronRight,
+  Wallet,
 } from 'lucide-react';
 
 export const JurorDashboardPage: React.FC = () => {
   const { address } = useAccount();
   const { disputes, approvedJurors, voteOnDispute } = useDisputes();
 
-  const currentAddress = address?.toLowerCase() || '0x741c000000000000000000000000000000000f9a';
+  const currentAddress = address?.toLowerCase() || '';
   const isApprovedJuror = approvedJurors.some((j) => j.toLowerCase() === currentAddress);
 
   // Filter pending votes (where address is in confirmedJurors and has NOT voted yet)
   const pendingVotes = disputes.filter((d) => {
+    if (!currentAddress) return false;
     const isPanel = d.confirmedJurors.some((j) => j.toLowerCase() === currentAddress);
     const hasVoted = Object.keys(d.jurorVotes || {}).some(
       (j) => j.toLowerCase() === currentAddress
@@ -35,6 +31,7 @@ export const JurorDashboardPage: React.FC = () => {
 
   // Filter past voting history
   const historyVotes = disputes.filter((d) => {
+    if (!currentAddress) return false;
     return Object.keys(d.jurorVotes || {}).some((j) => j.toLowerCase() === currentAddress);
   });
 
@@ -45,15 +42,36 @@ export const JurorDashboardPage: React.FC = () => {
     setVotingDisputeId(null);
   };
 
+  if (!address) {
+    return (
+      <div className="min-h-screen bg-[#fbf9f8] py-16 px-6 max-w-[1200px] mx-auto">
+        <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-10 text-center shadow-sm space-y-6 max-w-2xl mx-auto">
+          <div className="w-16 h-16 rounded-full bg-[#f5f3f3] flex items-center justify-center text-[#8E4585] mx-auto">
+            <Wallet className="w-8 h-8 text-[#8E4585]" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-[#1b1c1c]">Wallet Connection Required</h2>
+            <p className="text-sm text-[#50434c] max-w-md mx-auto">
+              Connect your wallet to access your Juror Dashboard, view assigned arbitration panels, and cast votes on active disputes.
+            </p>
+          </div>
+          <div className="pt-2 flex justify-center">
+            <ConnectWalletButton />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#fbf9f8] py-10 px-6 max-w-[1200px] mx-auto space-y-10">
-      {/* Dashboard Top Header (Matching Image 11) */}
+      {/* Dashboard Top Header */}
       <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className={`w-2.5 h-2.5 rounded-full ${isApprovedJuror ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
             <span className="text-xs font-semibold text-[#8E4585] uppercase tracking-wider">
-              Juror Credential Active
+              {isApprovedJuror ? 'Juror Credential Active' : 'Juror Credential Pending Approval'}
             </span>
           </div>
           <h1 className="text-3xl font-bold text-[#1b1c1c]">Juror Dashboard</h1>
@@ -62,7 +80,7 @@ export const JurorDashboardPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Stats Metrics Grid (Image 11) */}
+        {/* Stats Metrics Grid */}
         <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
           <div className="p-4 rounded-xl bg-[#f5f3f3] border border-[#d4c1cd]/30 text-center min-w-[140px]">
             <span className="text-2xl font-bold text-[#8E4585] block">{pendingVotes.length}</span>
@@ -95,7 +113,7 @@ export const JurorDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Currently Awaiting Your Vote Section (Matching Image 11) */}
+      {/* Currently Awaiting Your Vote Section */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-[#1b1c1c] flex items-center gap-2">
@@ -123,7 +141,7 @@ export const JurorDashboardPage: React.FC = () => {
                     </h3>
                   </div>
                   <span className="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full border border-amber-300 flex items-center gap-1 shrink-0">
-                    <Clock className="w-3 h-3" /> {dispute.timeRemaining || '24h left'}
+                    <Clock className="w-3 h-3" /> Active Phase
                   </span>
                 </div>
 
@@ -147,13 +165,13 @@ export const JurorDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Button & Modal trigger */}
+              {/* Action Button */}
               <div className="pt-2 flex gap-2">
                 <Link
                   to={`/dispute/${dispute.id}`}
                   className="flex-1 py-2.5 rounded-lg text-xs font-semibold text-[#1b1c1c] border border-[#d4c1cd] text-center hover:bg-[#f5f3f3]"
                 >
-                  View Evidence
+                  View Details
                 </Link>
                 <button
                   onClick={() => setVotingDisputeId(dispute.id)}
@@ -174,7 +192,7 @@ export const JurorDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Voting History Section (Matching Image 11) */}
+      {/* Voting History Section */}
       <div className="space-y-4 pt-6 border-t border-[#d4c1cd]/30">
         <h2 className="text-xl font-bold text-[#1b1c1c]">Voting History</h2>
 
