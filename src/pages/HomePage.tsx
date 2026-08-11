@@ -58,7 +58,7 @@ export const HomePage: React.FC = () => {
           className="md:col-span-6 space-y-6"
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#1b1c1c] leading-[1.1]">
-            Disputes, Resolved Fairly
+            Disputes Resolved Fairly
           </h1>
           <p className="text-lg text-[#50434c] leading-relaxed max-w-xl">
             Parties mutually select jurors from an approved pool. A majority vote decides the outcome fairly on-chain.
@@ -154,7 +154,7 @@ export const HomePage: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-[#f5f3f3] flex items-center justify-center text-[#8E4585] mb-4">
               <FileText className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">1. File a Dispute</h3>
+            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">File a Dispute</h3>
             <p className="text-sm text-[#50434c] leading-relaxed">
               Lock funds in escrow and submit evidence to initiate the arbitration process.
             </p>
@@ -167,7 +167,7 @@ export const HomePage: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-[#f5f3f3] flex items-center justify-center text-[#8E4585] mb-4">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">2. Propose Jurors</h3>
+            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">Propose Jurors</h3>
             <p className="text-sm text-[#50434c] leading-relaxed">
               Both parties select mutually agreeable jurors from the approved pool.
             </p>
@@ -180,7 +180,7 @@ export const HomePage: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-[#f5f3f3] flex items-center justify-center text-[#8E4585] mb-4">
               <Vote className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">3. Matched Jurors Vote</h3>
+            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">Matched Jurors Vote</h3>
             <p className="text-sm text-[#50434c] leading-relaxed">
               The selected panel reviews evidence and casts their deciding votes.
             </p>
@@ -193,7 +193,7 @@ export const HomePage: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-[#f5f3f3] flex items-center justify-center text-[#8E4585] mb-4">
               <Wallet className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">4. Funds Released</h3>
+            <h3 className="font-semibold text-lg mb-2 text-[#1b1c1c]">Funds Released</h3>
             <p className="text-sm text-[#50434c] leading-relaxed">
               Smart contracts automatically disburse funds based on the majority ruling.
             </p>
@@ -201,7 +201,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Fairness Explainer / Live Case #4092 Section */}
+      {/* Fairness Explainer / Live Case Section */}
       <section className="max-w-[1200px] mx-auto px-6 py-16 md:py-24 border-t border-[#4A4A4A]/10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
           <div className="md:col-span-5 space-y-6">
@@ -215,62 +215,80 @@ export const HomePage: React.FC = () => {
 
             <div className="pt-2">
               <Link
-                to="/dispute/4092"
+                to={disputes.length > 0 ? `/dispute/${disputes[0].id}` : '/file-dispute'}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-[#8E4585] hover:text-[#722d6c]"
               >
-                Inspect Live Case #4092 <ArrowRight className="w-4 h-4" />
+                {disputes.length > 0 ? `Inspect On-Chain Case #${disputes[0].id}` : 'Start First Dispute'}{' '}
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
 
           <div className="md:col-span-7">
-            <div className="border border-[#4A4A4A]/15 rounded-2xl bg-white p-8 shadow-md relative overflow-hidden">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <span className="inline-block px-3 py-1 bg-[#f5f3f3] text-xs font-semibold text-[#4A4A4A] rounded-md">
-                    Live Case #4092
+            {disputes.length > 0 ? (
+              <div className="border border-[#4A4A4A]/15 rounded-2xl bg-white p-8 shadow-md relative overflow-hidden">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <span className="inline-block px-3 py-1 bg-[#f5f3f3] text-xs font-semibold text-[#4A4A4A] rounded-md font-mono">
+                      On-Chain Case #{disputes[0].id}
+                    </span>
+                    <h3 className="text-xl font-semibold text-[#1b1c1c] mt-2 line-clamp-1">
+                      {disputes[0].description}
+                    </h3>
+                  </div>
+                  <span className="text-sm font-medium text-[#8E4585] bg-[#ffd7f4]/40 px-3 py-1 rounded-full border border-[#8E4585]/20">
+                    Escrow: {disputes[0].amountFormatted} {disputes[0].tokenSymbol}
                   </span>
-                  <h3 className="text-xl font-semibold text-[#1b1c1c] mt-2">Party A vs Party B</h3>
                 </div>
-                <span className="text-sm font-medium text-[#8E4585] bg-[#ffd7f4]/40 px-3 py-1 rounded-full border border-[#8E4585]/20">
-                  Voting Phase
+
+                <div className="mb-6 space-y-2">
+                  <div className="flex justify-between text-xs font-semibold text-[#50434c] uppercase tracking-wider">
+                    <span>Panel: {disputes[0].targetJurorCount} Jurors</span>
+                    <span>
+                      Confirmed Jurors: {disputes[0].confirmedJurors.length} / {disputes[0].targetJurorCount}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    {Array.from({ length: Math.min(disputes[0].targetJurorCount, 7) }).map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="w-10 h-10 rounded-full bg-[#f5f3f3] border border-[#4A4A4A]/20 flex items-center justify-center text-[#996666]"
+                        title={`Juror Slot #${idx + 1}`}
+                      >
+                        <UserCheck className="w-5 h-5 text-[#8E4585]" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#efeded]">
+                  <Link
+                    to={`/dispute/${disputes[0].id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8E4585] hover:text-[#722d6c]"
+                  >
+                    View On-Chain Arbitration Details <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="border border-[#4A4A4A]/15 rounded-2xl bg-white p-8 shadow-md relative overflow-hidden text-center space-y-4">
+                <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-md border border-emerald-200">
+                  Arc Testnet Smart Contract Ready
                 </span>
-              </div>
-
-              <div className="mb-6">
-                <div className="flex justify-between text-xs font-semibold text-[#50434c] mb-3 uppercase tracking-wider">
-                  <span>Panel: 5 Jurors</span>
-                  <span>Majority Threshold: 3 Votes</span>
-                </div>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((idx) => (
-                    <div
-                      key={idx}
-                      className="w-10 h-10 rounded-full bg-[#f5f3f3] border border-[#4A4A4A]/20 flex items-center justify-center text-[#996666]"
-                      title={`Juror #${idx}`}
-                    >
-                      <UserCheck className="w-5 h-5 text-[#8E4585]" />
-                    </div>
-                  ))}
+                <h3 className="text-xl font-semibold text-[#1b1c1c]">No Disputes Filed On-Chain Yet</h3>
+                <p className="text-xs text-[#50434c] max-w-md mx-auto leading-relaxed">
+                  Be the first to file a dispute on Arc Testnet to escrow tokens and initiate mutual juror selection.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    to="/file-dispute"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold text-white bg-[#8E4585] hover:bg-[#722d6c] shadow-sm"
+                  >
+                    File a Dispute <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
-
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-[#1b1c1c] font-medium">Current Vote</span>
-                  <span className="text-[#8E4585] font-semibold">3 - 1 Decision (Majority Reached)</span>
-                </div>
-                <div className="w-full h-3 bg-[#f5f3f3] rounded-full overflow-hidden flex">
-                  <div className="h-full bg-[#8E4585] w-[60%]" title="Party A: 3 Votes" />
-                  <div className="h-full bg-[#996666] w-[20%]" title="Party B: 1 Vote" />
-                  <div className="h-full bg-[#dbd9d9] w-[20%]" title="Pending: 1 Vote" />
-                </div>
-                <div className="flex justify-between text-xs text-[#50434c] mt-2">
-                  <span>Party A: 3 Votes</span>
-                  <span>Party B: 1 Vote</span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

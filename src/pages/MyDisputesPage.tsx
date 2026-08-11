@@ -17,7 +17,7 @@ import {
 export const MyDisputesPage: React.FC = () => {
   const { address } = useAccount();
   const { disputes, loading } = useDisputes();
-  const [activeTab, setActiveTab] = useState<'all' | 'claimant' | 'respondent' | 'voting'>('all');
+  const [activeTab, setActiveTab] = useState<'my' | 'all' | 'claimant' | 'respondent' | 'voting'>('my');
   const [searchQuery, setSearchQuery] = useState('');
 
   const currentAddress = (address || '').toLowerCase();
@@ -31,6 +31,9 @@ export const MyDisputesPage: React.FC = () => {
 
     if (!matchesSearch) return false;
 
+    if (activeTab === 'my') {
+      return d.partyA.toLowerCase() === currentAddress || d.partyB.toLowerCase() === currentAddress;
+    }
     if (activeTab === 'claimant') return d.partyA.toLowerCase() === currentAddress;
     if (activeTab === 'respondent') return d.partyB.toLowerCase() === currentAddress;
     if (activeTab === 'voting') return d.status === DisputeStatus.Voting;
@@ -77,7 +80,8 @@ export const MyDisputesPage: React.FC = () => {
           <div className="bg-white border border-[#d4c1cd]/40 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap gap-2 w-full md:w-auto">
               {[
-                { key: 'all', label: 'All Disputes' },
+                { key: 'my', label: 'My Disputes' },
+                { key: 'all', label: 'Public Directory' },
                 { key: 'claimant', label: 'As Claimant' },
                 { key: 'respondent', label: 'As Respondent' },
                 { key: 'voting', label: 'Voting Phase' },
